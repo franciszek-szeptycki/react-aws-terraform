@@ -1,6 +1,6 @@
 # Deployment of React app on AWS with Terraform and CircleCI
 
-# Live preview
+### Live preview
 *will appear soon*
 
 ### Technologies
