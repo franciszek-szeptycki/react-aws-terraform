@@ -1,9 +1,9 @@
 version: 2.1
 
 jobs:
-  build:
+  test:
     docker:
-      - image: circleci/node:18
+      - image: cimg/node:18.19
 
     steps:
       - checkout
@@ -11,6 +11,24 @@ jobs:
       - run:
           name: Install dependencies
           command: npm install
+          working_directory: client
+
+      - run:
+          name: Build
+          command: npm run test
+          working_directory: client
+
+  build:
+    docker:
+      - image: cimg/node:18.19
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install dependencies
+          command: npm install
+          working_directory: client
 
       - run:
           name: Build
@@ -21,44 +39,26 @@ jobs:
           root: .
           paths:
             - client/dist
-
-  test:
-    docker:
-      - image: circleci/node:18
-
-    steps:
-      - attach_workspace:
-          at: .
-
-      - run:
-          name: Install dependencies
-          command: npm install
-          working_directory: client
-
-      - run:
-          name: Run tests
-          command: npm run test
-          working_directory: client
-
+  
   deploy:
     docker:
-      - image: circleci/node:18
-
+      - image: cimg/aws:2024.03
     steps:
       - attach_workspace:
           at: .
-
-      # Add deployment steps here
+      - run:
+          name: Deploy to AWS S3
+          command: |
+            aws s3 sync client/dist s3://static-website-franeksz --delete
 
 workflows:
   version: 2
   build_test_deploy:
     jobs:
-      - build
-      - test:
+      - test
+      - build:
           requires:
-            - build
+            - test
       - deploy:
           requires:
             - build
-
