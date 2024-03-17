@@ -9,6 +9,4 @@
 - AWS
     - CloudFront
     - S3
-    - Certificate Manager
-    - Route 55
     - IAM
